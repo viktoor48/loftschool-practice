@@ -40,6 +40,7 @@ function loadTowns() {
     return fetch('https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json')
         .then(response => {
             if (response.status >= 400) {
+                console.log('status >= 400');
                 return Promise.reject();
             }
 
@@ -57,7 +58,7 @@ function loadTowns() {
                 return 0;
             });
         })
-        .then(() => console.log('Не удалось загрузить города'))
+        .catch(() => console.log('Не удалось загрузить города'))
 }
 
 /*
@@ -88,9 +89,20 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
-filterInput.addEventListener('keyup', function() {
-    // это обработчик нажатия кливиш в текстовом поле
+let cities = [];
 
+loadTowns()
+    .then(towns => {
+        cities = towns;
+    })
+    .then(() => {
+        loadingBlock.style.display = 'none';
+        filterBlock.style.display = 'block';
+    })
+
+filterInput.addEventListener('keyup', function(event) {
+    // это обработчик нажатия кливиш в текстовом поле
+    filterResult.innerHTML = Array.from(cities.filter(item => isMatching(item.name, filterInput.value)), item => item.name);
 });
 
 export {
